@@ -6,6 +6,7 @@ package gopherws
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/gopherjs/gopherjs/js"
 	"gitlab.768bit.com/vann/gopherws/websocketjs"
@@ -63,7 +64,7 @@ var errDeadlineReached = &deadlineErr{}
 
 // Dial opens a new WebSocket connection. It will block until the connection is
 // established or fails to connect.
-func Dial(url string) (Conn, error) {
+func Dial(url string) (*Conn, error) {
 	ws, err := websocketjs.New(url)
 	if err != nil {
 		return nil, err
@@ -138,17 +139,17 @@ func (c *Conn) onClose(event *js.Object) {
 	}()
 }
 
-// Subprotocol returns the negotiated protocol for the connection.
+// Set session key for connection
 func (c *Conn) SetSeshKey(seshKey string) {
 	c.seshKey = seshKey
 }
 
-// Subprotocol returns the negotiated protocol for the connection.
+// Get session key
 func (c *Conn) GetSeshKey() string {
 	return c.seshKey
 }
 
-// Subprotocol returns the negotiated protocol for the connection.
+// Add session to connection
 func (c *Conn) AddSession(id string, sessionObj interface{}) error {
 	if c.seshKey == "" || c.sessions[id] != nil {
 
@@ -161,7 +162,7 @@ func (c *Conn) AddSession(id string, sessionObj interface{}) error {
 	return nil
 }
 
-// Subprotocol returns the negotiated protocol for the connection.
+// Return session object
 func (c *Conn) GetSession(id string) (interface{}, error) {
 	if c.seshKey == "" || c.sessions[id] == nil {
 
